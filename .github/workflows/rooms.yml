@@ -2,7 +2,7 @@ name: Update room report
 
 on:
   schedule:
-    - cron: "12,42 * * * *"
+    - cron: "5,15,25,35,45,55 * * * *"
   workflow_dispatch:
 
 jobs:
