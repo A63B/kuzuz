@@ -1,36 +1,43 @@
-name: Python Package using Conda
+name: Python scheduled script
 
 on:
   push:
   schedule:
     - cron: "*/5 * * * *"
-  workflow_dispatch:
 
 jobs:
   build-linux:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 5
 
     permissions:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
 
-    - name: Run script
-      run: |
-        python script.py
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
 
-    - name: Commit changed files
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add -A
-        git diff --cached --quiet || git commit -m "scheduled update"
-        git push
+      - name: Run script
+        run: |
+          python script.py
+
+      - name: Commit changed files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "scheduled update"
+            git push
+          fi
