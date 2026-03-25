@@ -1,0 +1,38 @@
+name: Run python every 10 minutes
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install deps
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: run script
+        run: python script.py
+
+      - name: commit csv
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add *.csv
+
+          git diff --cached --quiet || git commit -m "update csv"
+
+          git push
