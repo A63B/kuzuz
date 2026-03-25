@@ -1,40 +1,36 @@
-name: Run script every 5 minutes
+name: Python Package using Conda
 
 on:
+  push:
   schedule:
-    - cron: "2-59/5 * * * *"
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 
 jobs:
-  run-script:
+  build-linux:
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
     permissions:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
 
-      - name: Install requirements
-        run: pip install -r requirements.txt
+    - name: Run script
+      run: |
+        python script.py
 
-      - name: Run script
-        run: python script.py
-
-      - name: Commit changed CSV files
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          find . -type f -name "*.csv" -print0 | xargs -0 -r git add
-
-          if git diff --cached --quiet; then
-            echo "No CSV changes"
-          else
-            git commit -m "Update CSV output"
-            git push
-          fi
+    - name: Commit changed files
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add -A
+        git diff --cached --quiet || git commit -m "scheduled update"
+        git push
