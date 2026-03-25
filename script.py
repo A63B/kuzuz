@@ -27,7 +27,7 @@ HEADERS = {
 }
 
 COOKIES = {
-    "JSESSIONID": "A74BC16C369FFB7ADE64FA58ABE2B82E"
+    "JSESSIONID": "24144F5F9061F1EDA82821D958F24EFB"
 }
 
 SLOTS = [f"{h:02d}:{m:02d}" for h in range(9, 23) for m in (0, 30) if (h, m) <= (22, 30)]
